@@ -13,27 +13,28 @@
     <button onclick="sendPrompt()">Generate</button>
     <div id="output"></div>
 
-    <script>
-        function sendPrompt() {
-            const prompt = document.getElementById("prompt").value;
-            const output = document.getElementById("output");
-            output.innerText = "";
+  <script>
+    function sendPrompt() {
+        const prompt = document.getElementById("prompt").value;
+        const output = document.getElementById("output");
+        output.innerText = "";
 
-            const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(prompt)}`);
+        const eventSource = new EventSource(`https://en0zedfa6t97m5-8080.proxy.runpod.net/stream?prompt=${encodeURIComponent(prompt)}`);
 
-            eventSource.onmessage = function(event) {
-                if (event.data === "[DONE]") {
-                    eventSource.close();
-                } else {
-                    output.innerText += event.data;
-                }
-            };
-
-            eventSource.onerror = function() {
-                output.innerText += "\n[Error receiving data]";
+        eventSource.onmessage = function(event) {
+            if (event.data === "[DONE]") {
                 eventSource.close();
-            };
-        }
-    </script>
+            } else {
+                output.innerText += event.data;
+            }
+        };
+
+        eventSource.onerror = function() {
+            output.innerText += "\n[Error receiving data]";
+            eventSource.close();
+        };
+    }
+</script>
+
 </body>
 </html>
