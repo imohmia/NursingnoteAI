@@ -397,6 +397,11 @@ window.addEventListener('resize', () => {
 });
 
 animateParticles();
+  document.querySelector("button").addEventListener("click", function () {
+  // You can add real validation later
+  localStorage.setItem("isLoggedIn", "true");
+  window.location.href = "index.html";
+});
 </script>
 
 
