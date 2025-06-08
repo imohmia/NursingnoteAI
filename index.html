@@ -1,40 +1,520 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Live AI Streaming</title>
-    <style>
-        body { font-family: Arial; padding: 20px; }
-        #output { white-space: pre-line; border: 1px solid #ccc; padding: 10px; margin-top: 10px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Nursing Notes AI</title>
+  <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/decoupled-document/ckeditor.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f3f5f9;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .background-animation {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, #f3f5f9 0%, #e0e7ef 100%);
+      animation: gradientMove 8s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%;}
+      100% { background-position: 100% 50%;}
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .input-area {
+      width: 90%;
+      max-width: 700px;
+      border-radius: 50px;
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      padding: 4px 20px;
+      transition: transform 0.8s ease, box-shadow 0.3s, border 0.3s;
+      position: relative;
+      margin-top: 80px;
+      border: 2px solid #e0e7ef;
+    }
+    .input-area.moved {
+      transform: translateY(-80px);
+    }
+    .input-area:focus-within {
+      border: 2px solid #00f2fe;
+      box-shadow: 0 0 0 3px #00f2fe33;
+    }
+    textarea {
+      width: 100%;
+      height: 48px;
+      border: none;
+      resize: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      padding: 12px 0;           /* Add vertical padding */
+      box-sizing: border-box;    /* Ensure padding doesn't overflow */
+      line-height: 1.5;          /* Optional: improve vertical centering */
+      text-align: center;        /* Optional: center text horizontally */
+    }
+    textarea::placeholder {
+      color: #b0b8c1;
+      opacity: 1;
+      font-size: 1.1rem;
+    }
+    .submit-icon {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: linear-gradient(to right, #0e2233, #00f2fe);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      opacity: 0.8;
+      font-size: 18px;
+      color: white;
+    }
+    .submit-icon:hover {
+      opacity: 1;
+    }
+    #output, #editor-wrapper {
+      animation: fadeInUp 0.7s cubic-bezier(.23,1.01,.32,1) both;
+      border: 1.5px solid #e0e7ef;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    #output {
+      margin-top: 30px;
+      width: 92%;
+      max-width: 720px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      white-space: pre-wrap;
+      display: none;
+      position: relative; /* Make sure the icon is positioned relative to the box */
+    }
+    .typing::after {
+      content: " |";
+      animation: blink 1s step-start infinite, colorPulse 1.5s infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    @keyframes colorPulse {
+      0%,100% { color: #00f2fe;}
+      50% { color: #4facfe;}
+    }
+    #editor-wrapper {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      margin-top: 30px;
+      width: 92%;
+      max-width: 750px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 3px 18px rgba(0,0,0,0.08);
+      overflow: hidden;
+      position: relative; /* Add this line */
+    }
+    .copy-icon {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.3rem;
+      background: #f3f5f9;
+      border-radius: 50%;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #00f2fe22;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+    }
+    .copy-icon:hover {
+      background: #00f2fe;
+      color: #fff;
+    }
+    #editor-copy {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  background: #f9fbfd;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e0e7ef;
+  transition: background 0.2s, box-shadow 0.2s;
+  z-index: 10;
+  display: none;
+  border: 1px solid #e0e7ef;
+}
+    #editor-copy:hover {
+      background: #e0e7ef;
+      box-shadow: 0 4px 16px #e0e7ef;
+    }
+    #editor-copy svg {
+      display: block;
+    }
+    @media (max-width: 900px) {
+      #editor-copy {
+        right: 2vw;
+      }
+    }
+    .ck-editor__editable {
+  border: none !important;
+  padding: 16px;
+  font-size: 15px;
+  background: transparent;
+  box-shadow: none !important;
+  min-height: 150px;
+}
+.ck-toolbar {
+  border: none !important;
+  background: #f9fbfd;
+  border-bottom: 1px solid #e0e7ef;
+  border-radius: 12px 12px 0 0;
+  padding: 6px 10px;
+}
+    .ck-toolbar__separator {
+      display: none;
+    }
+    .ck.ck-editor__main {
+      min-height: 200px;
+    }
+    .ck.ck-editor__editable:not(.ck-focused) {
+      border: 1px solid #e0e7ef;
+      box-shadow: none;
+    }
+    .ck.ck-editor__editable.ck-focused {
+      border-color: #00f2fe;
+      box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.2);
+    }
+    
+    .highlight-uncertain {
+  background: yellow;
+  color: #222;
+  border-radius: 4px;
+  padding: 0 2px;
+}
+    .highlight-uncertain:hover {
+      background: #ffecb3;
+      color: #000;
+    }
+   .branding-top-left {
+  position: fixed;
+  top: 18px;
+  left: 28px;
+  font-family: 'Cinzel Decorative', 'Orbitron', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #060606 0%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.4),
+    0 2px 10px rgba(212, 175, 55, 0.3);
+  padding: 10px 28px;
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 0 6px rgba(255, 255, 255, 0.1),
+    0 6px 18px rgba(212, 175, 55, 0.25),
+    0 0 2px rgba(255, 255, 255, 0.1);
+  z-index: 100;
+  user-select: none;
+}
+
+
+
+.branding-bottom-right {
+  position: fixed;
+  bottom: 18px;
+  right: 28px;
+  font-family: 'Orbitron', 'Inter', Arial, sans-serif;
+  font-size: 1.02rem;
+  color: #b0b8c1;
+  font-style: italic;
+  letter-spacing: 1.2px;
+  background: rgba(255,255,255,0.6);
+  padding: 6px 18px;
+  border-radius: 14px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 8px #e0e7ef88;
+  z-index: 100;
+  user-select: none;
+}
+  </style>
 </head>
 <body>
-    <h2>AI Streaming Demo</h2>
-    <input type="text" id="prompt" placeholder="Enter your prompt..." style="width: 80%;">
-    <button onclick="sendPrompt()">Generate</button>
-    <div id="output"></div>
+   <div class="branding-top-left">Nursing Note AI 1.0</div>
+  <div class="branding-bottom-right">developed by seyed</div>
+  <div class="background-animation"></div>
+  <div class="background-animation"></div>
+  <div class="container">
+    <div class="input-area" id="inputBox">
+      <textarea id="prompt" placeholder="Let’s document this together — what happened?" oninput="autoResizeTextarea(this)"></textarea>
+      <div class="submit-icon" id="streamIcon" onclick="handleStreamToggle()">
+        <span id="iconSymbol">↓</span>
+      </div>
+    </div>
+    <div id="output">
 
-  <script>
-    function sendPrompt() {
-        const prompt = document.getElementById("prompt").value;
-        const output = document.getElementById("output");
-        output.innerText = "";
+    </<div id="output"></div>
+<div id="editor-wrapper">
+  <div id="toolbar-container"></div>
+  <div id="editor"></div>
+  <span class="copy-icon" id="editor-copy" onclick="copyEditorContent()" title="Copy to clipboard" style="display:none;">
+  <svg id="copy-svg" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+    <rect x="7" y="9" width="10" height="11" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/>
+    <rect x="5" y="5" width="10" height="11" rx="2" fill="#f3f5f9" stroke="#888" stroke-width="1.5"/>
+    <rect x="9" y="2" width="6" height="3" rx="1" fill="#fff" stroke="#222" stroke-width="1.2"/>
+  </svg>
+</span>
+</div>
 
-        const eventSource = new EventSource(`https://en0zedfa6t97m5-8080.proxy.runpod.net/stream?prompt=${encodeURIComponent(prompt)}`);
+<script>
+  let eventSource = null;
+  let sentenceBuffer = "";
+  let isStreaming = false;
+  let editorInstance;
+  let fullGeneratedText = "";
+  let inactivityTimer = null;
 
-        eventSource.onmessage = function(event) {
-            if (event.data === "[DONE]") {
-                eventSource.close();
-            } else {
-                output.innerText += event.data;
-            }
-        };
-
-        eventSource.onerror = function() {
-            output.innerText += "\n[Error receiving data]";
-            eventSource.close();
-        };
+  function handleStreamToggle() {
+    if (isStreaming) {
+      stopStream(true);
+    } else {
+      startStream();
     }
+  }
+
+  function startStream() {
+    const prompt = document.getElementById("prompt").value.trim();
+    if (!prompt) return;
+
+    const output = document.getElementById("output");
+    const icon = document.getElementById("iconSymbol");
+
+    output.innerHTML = '';
+    output.style.display = "block";
+    document.getElementById("editor-wrapper").style.display = "none";
+    document.getElementById("editor-wrapper").style.opacity = 0;
+
+    sentenceBuffer = "";
+    fullGeneratedText = "";
+    isStreaming = true;
+    icon.textContent = "■";
+    document.getElementById("inputBox").classList.add("moved");
+
+    const typingLine = document.createElement("div");
+    typingLine.className = "typing";
+    output.appendChild(typingLine);
+
+    eventSource = new EventSource(`http://127.0.0.1:8000/stream?prompt=${encodeURIComponent(prompt)}`);
+
+    eventSource.onmessage = function(event) {
+      if (event.data === "[DONE]") {
+        stopStream(false);
+        return;
+      }
+
+      const token = event.data;
+      sentenceBuffer += token;
+
+      const typingLine = output.querySelector(".typing");
+      if (token === "." || token.endsWith(".")) {
+        const finalLine = document.createElement("div");
+        finalLine.textContent = sentenceBuffer.trim();
+        output.insertBefore(finalLine, typingLine);
+        fullGeneratedText += sentenceBuffer.trim() + " ";
+        sentenceBuffer = "";
+        typingLine.textContent = "";
+      } else {
+        typingLine.textContent = sentenceBuffer;
+      }
+
+      // Reset inactivity timer
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        if (isStreaming) stopStream(true);
+      }, 4000);
+
+      output.scrollTop = output.scrollHeight;
+    };
+
+    eventSource.onerror = function(err) {
+      console.error("Stream error:", err);
+      stopStream(false);
+    };
+  }
+
+  function stopStream(manual = false) {
+    const icon = document.getElementById("iconSymbol");
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    isStreaming = false;
+    icon.textContent = "↓";
+    flushBuffer();
+    setTimeout(() => showEditor(fullGeneratedText), 300);
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+  }
+
+  function flushBuffer() {
+    const output = document.getElementById("output");
+    const typingLine = output.querySelector(".typing");
+
+    if (sentenceBuffer.trim()) {
+      const finalLine = document.createElement("div");
+      finalLine.textContent = sentenceBuffer.trim();
+      output.insertBefore(finalLine, typingLine);
+      fullGeneratedText += sentenceBuffer.trim();
+      sentenceBuffer = "";
+    }
+    if (typingLine) typingLine.remove();
+    output.style.display = "none";
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+  }
+
+  function showEditor(content) {
+  const wrapper = document.getElementById("editor-wrapper");
+  wrapper.style.display = "block";
+  document.getElementById("editor-copy").style.display = "inline-block";
+  if (editorInstance) {
+    editorInstance.destroy().then(() => {
+      editorInstance = null;
+      createEditor(content, wrapper);
+    });
+  } else {
+    createEditor(content, wrapper);
+  }
+}
+
+  function createEditor(content, wrapper) {
+  DecoupledEditor
+    .create(document.querySelector('#editor'), {
+      htmlSupport: {
+        allow: [
+          {
+            name: 'span',
+            classes: ['highlight-uncertain'],
+            attributes: true
+          }
+        ]
+      }
+    })
+    .then(editor => {
+      editorInstance = editor;
+
+      const toolbarContainer = document.querySelector('#toolbar-container');
+      toolbarContainer.innerHTML = "";
+      toolbarContainer.appendChild(editor.ui.view.toolbar.element);
+
+      // Set highlighted HTML directly
+      const safeHTML = content
+  .split("\n")
+  .map(line => line.trim() ? line : "&nbsp;")
+  .map(line => `<p>${line}</p>`)
+  .join("");
+
+const highlightedContent = applyCustomHighlights(safeHTML);
+editor.setData(highlightedContent);
+
+      wrapper.style.opacity = 1;
+    })
+    .catch(error => console.error(error));
+}
+
+function autoResizeTextarea(el) {
+  el.style.height = '48px';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function copyOutput() {
+  const output = document.getElementById("output");
+  const icon = output.querySelector('.copy-icon');
+
+  if (icon) icon.style.display = 'none';
+  const text = output.innerText;
+  if (icon) icon.style.display = '';
+
+  navigator.clipboard.writeText(text.trim());
+  icon.textContent = "✅";
+  setTimeout(() => icon.textContent = "📋", 1200);
+}
+
+function copyEditorContent() {
+  if (editorInstance) {
+    const text = editorInstance.getData().replace(/<[^>]+>/g, '').trim();
+    const icon = document.getElementById("editor-copy");
+    const svg = document.getElementById("copy-svg");
+
+    navigator.clipboard.writeText(text);
+
+    if (svg) {
+      svg.outerHTML = `<svg id="copy-svg" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M6 13l4 4 8-8" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+      setTimeout(() => {
+        icon.innerHTML = `<svg id="copy-svg" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+          <rect x="7" y="9" width="10" height="11" rx="2" fill="#fff" stroke="#222" stroke-width="1.5"/>
+          <rect x="5" y="5" width="10" height="11" rx="2" fill="#f3f5f9" stroke="#888" stroke-width="1.5"/>
+          <rect x="9" y="2" width="6" height="3" rx="1" fill="#fff" stroke="#222" stroke-width="1.2"/>
+        </svg>`;
+      }, 1200);
+    }
+  }
+}
+
+
+  document.getElementById("prompt").addEventListener("input", function() {
+    this.style.height = '48px';
+    this.style.height = this.scrollHeight + 'px';
+  });
+
+  document.getElementById("output").addEventListener("click", copyOutput);
+  document.getElementById("editor-copy").addEventListener("click", copyEditorContent);
+
+  // Initialize the textarea height
+  autoResizeTextarea(document.getElementById("prompt"));
+function applyCustomHighlights(text) {
+  // Numbers (e.g. 250, 100 ml, etc.)
+  text = text.replace(/\b\d+(\.\d+)?\b/g, '<span class="highlight-uncertain">$&</span>');
+
+  // Medication mentions (basic match, extend as needed)
+  text = text.replace(/\b(ferrosac|normal saline|paracetamol|ceftriaxone)\b/gi, '<span class="highlight-uncertain">$&</span>');
+
+  // Keywords like DOB, patient name (extend if needed)
+  text = text.replace(/\b(DOB|patient name|discharged)\b/gi, '<span class="highlight-uncertain">$&</span>');
+
+  return text;
+}
+
 </script>
 
-</body>
+  </body>
 </html>
