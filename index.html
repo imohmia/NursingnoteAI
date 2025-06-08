@@ -542,21 +542,7 @@ function logout() {
   localStorage.removeItem("isLoggedIn");
   window.location.href = "login.html";
 }
-  document.getElementById("loginBtn").addEventListener("click", function () {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
 
-  // Example credentials (you can change this!)
-  const validUser = "seyed";
-  const validPass = "seyed";
-
-  if (username === validUser && password === validPass) {
-    localStorage.setItem("isLoggedIn", "true");
-    window.location.href = "index.html";
-  } else {
-    alert("Invalid credentials. Please try again.");
-  }
-});
 </script>
 
   </body>
