@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Nursing Notes AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2d9d6c54b.js" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+  margin: 0;
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(135deg, #e3f6fd 0%, #f3f5f9 100%);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+    .background {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      z-index: -3;
+      overflow: hidden;
+      top: 0; left: 0;
+    }
+
+    .orb {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, #131f1c99 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 8s infinite ease-in-out;
+      filter: blur(80px);
+      opacity: 0.7;
+    }
+    .orb:nth-child(1) { top: -100px; left: -100px; }
+    .orb:nth-child(2) { bottom: -80px; right: -60px; animation-delay: 2s; }
+
+    @keyframes float {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+
+    /* Floating SVG web lines */
+    .web-lines {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0; left: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.45;
+      animation: moveLines 18s linear infinite alternate;
+    }
+    @keyframes moveLines {
+      0% { transform: translateY(0) scale(1);}
+      100% { transform: translateY(-30px) scale(1.04);}
+    }
+
+    .login-container {
+      background: rgba(30, 41, 59, 0.65);
+      border: 1.5px solid rgba(0,242,254,0.13);
+      backdrop-filter: blur(24px);
+      border-radius: 28px;
+      padding: 44px 34px 36px 34px;
+      width: 370px;
+      text-align: center;
+      box-shadow: 0 8px 32px 0 #00f2fe22, 0 1.5px 12px #00e3ae22;
+      z-index: 2;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-container h2 {
+      font-family: 'Poppins', Arial, sans-serif;
+      color: #20999f;
+      font-size: 2.1rem;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      margin-bottom: 28px;
+      text-shadow: 0 2px 16px #77e68244, 0 1px 0 #fff2;
+      background: linear-gradient(90deg, #19962a 0%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 13px 16px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.10);
+      color: #fff;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: 0.3s;
+      box-shadow: 0 1px 8px #00f2fe11;
+      outline: 1.5px solid transparent;
+    }
+    .login-container input:focus {
+      background: rgba(0, 242, 254, 0.08);
+      outline: 1.5px solid #00f2fe;
+      box-shadow: 0 0 8px #00f2fe55;
+    }
+    .login-container input::placeholder {
+      color: #b0b8c1;
+      letter-spacing: 0.5px;
+      font-size: 1rem;
+    }
+
+    .login-container button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 20px;
+  background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+  border: none;
+  border-radius: 16px;
+  color: #0f172a;
+  font-size: 17px;
+  font-family: 'Inter', sans-serif; /* Changed font */
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  box-shadow: 0 2px 16px #00f2fe33;
+  transition: all 0.25s cubic-bezier(.4,2,.6,1);
+  text-shadow: 0 1px 0 #fff8;
+  position: relative;
+  overflow: hidden;
+}
+    .login-container button:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 0 24px #00f2fe77, 0 2px 16px #00e3ae44;
+      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+      color: #222;
+    }
+
+    .social-login {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    .social-login i {
+      font-size: 22px;
+      color: #00f2fe;
+      padding: 11px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      transition: 0.3s;
+      cursor: pointer;
+      box-shadow: 0 1px 8px #00f2fe22;
+      border: 1.5px solid transparent;
+    }
+    .social-login i:hover {
+      background: #00f2fe;
+      color: #0f172a;
+      transform: scale(1.18);
+      border: 1.5px solid #4facfe;
+      box-shadow: 0 0 16px #00f2fe77;
+    }
+
+    .login-container small {
+      display: block;
+      margin-top: 20px;
+      color: #b0b8c1;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      font-family: 'Inter', sans-serif;
+      opacity: 0.85;
+    }
+    /* ENTRY ANIMATION */
+.login-container {
+  animation: fadeInScale 1.2s ease forwards;
+  opacity: 0;
+  transform: scale(0.9);
+}
+@keyframes fadeInScale {
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* SHINE EFFECT ON BUTTON */
+.login-container button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.3), rgba(255,255,255,0));
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+.login-container button:hover::after {
+  left: 130%;
+  transition: left 0.6s ease;
+}
+.login-container button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* INPUT GLOW ON FOCUS */
+.login-container input:focus {
+  background: rgba(0, 242, 254, 0.1);
+  box-shadow: 0 0 12px #00f2feaa, inset 0 0 8px #00f2fe55;
+  border: 1.5px solid #00f2fe88;
+}
+
+/* OPTIONAL: Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #00f2fe55;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+.footer-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 18px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: #6b7280;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+.footer-credit:hover {
+  color: #06ff49;
+  box-shadow: 0 0 8px #00f2fe66;
+}
+    .footer-credit strong {
+      color: #8b8907;
+    }   
+    .version-badge {
+  position: fixed;
+  top: 12px;
+  left: 18px;
+  font-size: 13px;
+  font-family: 'Orbitron', sans-serif;
+  color: #4facfe;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 4px 10px;
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  letter-spacing: 1px;
+}
+    .version-badge:hover {
+      color: #e8480d;
+      box-shadow: 0 0 8px #00f2fe66;
+    }
+  </style>
+</head>
+<div class="version-badge">v1.0</div>
+
+<div class="footer-credit">
+  Developed by <strong>Seyed</strong>
+</div>
+<body>
+  <div class="background">
+    <svg class="web-lines" width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 700 Q360 600 720 700 T1440 700" stroke="#00f2fe" stroke-width="1.5" opacity="0.18" fill="none"/>
+      <path d="M0 600 Q360 500 720 600 T1440 600" stroke="#4facfe" stroke-width="1.2" opacity="0.13" fill="none"/>
+      <path d="M0 500 Q360 400 720 500 T1440 500" stroke="#00e3ae" stroke-width="1.2" opacity="0.13" fill="none"/>
+      <path d="M0 400 Q360 300 720 400 T1440 400" stroke="#00f2fe" stroke-width="1.2" opacity="0.10" fill="none"/>
+      <path d="M0 300 Q360 200 720 300 T1440 300" stroke="#4facfe" stroke-width="1.2" opacity="0.08" fill="none"/>
+      <path d="M0 200 Q360 100 720 200 T1440 200" stroke="#00e3ae" stroke-width="1.2" opacity="0.08" fill="none"/>
+    </svg>
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <canvas id="particles"></canvas>
+  </div>
+
+  <div class="login-container">
+    <h2>Nursing Notes AI</h2>
+    <input type="text" placeholder="Username" />
+    <input type="password" placeholder="Password" />
+    <button>Login</button>
+
+  </div>
+</body>
+<script>
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+const numParticles = 100;
+const maxDistance = 120;
+const repelRadius = 100;
+let mouse = { x: null, y: null };
+
+for (let i = 0; i < numParticles; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 2 + 1,
+    dx: (Math.random() - 0.5) * 0.6,
+    dy: (Math.random() - 0.5) * 0.6
+  });
+}
+
+window.addEventListener('mousemove', (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+window.addEventListener('mouseleave', () => {
+  mouse.x = null;
+  mouse.y = null;
+});
+
+function drawLine(p1, p2) {
+  const dx = p1.x - p2.x;
+  const dy = p1.y - p2.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < maxDistance) {
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.strokeStyle = `rgba(0, 242, 254, ${1 - distance / maxDistance})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < numParticles; i++) {
+    const p = particles[i];
+
+    // Repel from mouse
+    if (mouse.x && mouse.y) {
+      const dx = p.x - mouse.x;
+      const dy = p.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < repelRadius) {
+        const force = (repelRadius - dist) / repelRadius;
+        const angle = Math.atan2(dy, dx);
+        const repelStrength = 2.5;
+        p.dx += Math.cos(angle) * force * repelStrength;
+        p.dy += Math.sin(angle) * force * repelStrength;
+      }
+    }
+
+    p.x += p.dx;
+    p.y += p.dy;
+
+    // Keep particles within bounds
+    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+    ctx.fillStyle = '#00f2fe88';
+    ctx.fill();
+
+    for (let j = i + 1; j < numParticles; j++) {
+      drawLine(p, particles[j]);
+    }
+
+    // Slow down over time (optional damping)
+    p.dx *= 0.98;
+    p.dy *= 0.98;
+  }
+
+  requestAnimationFrame(animateParticles);
+}
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+animateParticles();
+</script>
+
+
+
+</html>
