@@ -312,7 +312,9 @@
       startStream();
     }
   }
-
+ if (localStorage.getItem("isLoggedIn") !== "true") {
+    window.location.href = "login.html";
+  }
   function startStream() {
     const prompt = document.getElementById("prompt").value.trim();
     if (!prompt) return;
