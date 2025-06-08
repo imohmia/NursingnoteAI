@@ -293,9 +293,10 @@
 
   <div class="login-container">
     <h2>Nursing Notes AI</h2>
-    <input type="text" placeholder="Username" />
-    <input type="password" placeholder="Password" />
-    <button>Login</button>
+    <input type="text" id="username" placeholder="Username" />
+<input type="password" id="password" placeholder="Password" />
+<button id="loginBtn">Login</button>
+
 
   </div>
 </body>
@@ -397,18 +398,14 @@ window.addEventListener('resize', () => {
 });
 
 animateParticles();
-  document.querySelector("button").addEventListener("click", function () {
-  // You can add real validation later
-  localStorage.setItem("isLoggedIn", "true");
-  window.location.href = "index.html";
-});
+  
   document.getElementById("loginBtn").addEventListener("click", function () {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
   // Example credentials (you can change this!)
   const validUser = "seyed";
-  const validPass = "triage123";
+  const validPass = "seyed";
 
   if (username === validUser && password === validPass) {
     localStorage.setItem("isLoggedIn", "true");
