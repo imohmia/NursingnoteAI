@@ -270,6 +270,7 @@
 }
   </style>
 </head>
+  <button onclick="logout()" class="logout-btn">Logout</button>
 <body>
    <div class="branding-top-left">Nursing Note AI 1.0</div>
   <div class="branding-bottom-right">developed by seyed</div>
@@ -515,7 +516,10 @@ function applyCustomHighlights(text) {
 
   return text;
 }
-
+function logout() {
+  localStorage.removeItem("isLoggedIn");
+  window.location.href = "login.html";
+}
 </script>
 
   </body>
