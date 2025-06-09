@@ -117,7 +117,8 @@ def stream(prompt: str):
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
-    if __name__ == "__main__":
+
+# ✅ THIS PART MUST BE OUTSIDE FUNCTIONS
+if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)
-
