@@ -389,7 +389,8 @@
     typingLine.className = "typing";
     output.appendChild(typingLine);
 
-    eventSource = new EventSource(`http://127.0.0.1:8000/stream?prompt=${encodeURIComponent(prompt)}`);
+    eventSource = new EventSource(`https://ophk2j16eyv7hg-8080.proxy.runpod.net/stream?prompt=${encodeURIComponent(prompt)}`);
+
 
     eventSource.onmessage = function(event) {
       if (event.data === "[DONE]") {
